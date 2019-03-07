@@ -7,9 +7,15 @@ const int PORT = 4567;
 
 int main() {
   std::cout << "Connecting to simulator" << std::endl;
+  int cnt = 0;
   SimIO simulator(PORT, [&](double cte, double speed, double angle) {
-    std::cout << cte << "\t" << speed << "\t" << angle << std::endl;
-    return std::make_tuple(0,1);
+    cnt += 1;
+    std::cout << cnt << "\t" << cte << "\t" << speed << "\t" << angle << std::endl;
+    if (cnt > 200) {
+      cnt = 0;
+      return std::make_tuple(0,0,true);
+    }
+    return std::make_tuple(0,1, false);
   });
 
   simulator.run();

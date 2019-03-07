@@ -22,13 +22,19 @@ SimIO::SimIO(int port, ProcessCb cb) : port_(port), callbackFunc_(cb) {
           double angle = std::stod(j[1]["steering_angle"].get<std::string>());
           // get steering angle
           double steer_value, throttle;
-          std::tie(steer_value, throttle) = callbackFunc_(cte, speed, angle);
-          // send output message
-          nlohmann::json msgJson;
-          msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = 0.3;
-          auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+          bool reset;
+          std::tie(steer_value, throttle, reset) = callbackFunc_(cte, speed, angle);
+          if(reset) {
+            std::string reset_msg = "42[\"reset\",{}]";
+            ws.send(reset_msg.data(), reset_msg.length(), uWS::OpCode::TEXT);
+          } else {
+            // send output message
+            nlohmann::json msgJson;
+            msgJson["steering_angle"] = steer_value;
+            msgJson["throttle"] = 0.3;
+            auto msg = "42[\"steer\"," + msgJson.dump() + "]";
+            ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+          }
         }
       } else {
         std::string msg = "42[\"manual\",{}]";

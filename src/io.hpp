@@ -8,8 +8,8 @@
 #include "json.hpp"
 
 // callback function definition
-// takes observations and control data
-typedef std::function< std::tuple<double, double>(double cte, double speed,
+// processes and returns steering angle, throttle, and whether or not to reset the sim
+typedef std::function< std::tuple<double, double, bool>(double cte, double speed,
   double angle) > ProcessCb;
 
 /*
