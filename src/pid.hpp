@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <sstream>
+
 class PID {
  public:
   /**
@@ -14,34 +17,42 @@ class PID {
 
   /**
    * Initialize PID.
-   * @param (Kp_, Ki_, Kd_) The initial PID coefficients
+   * @param (ki, ki, kd) PID coefficients
+   * @param max_i Maximum integral windup
+   * @param effort_limit max absolute error
    */
-  void Init(double Kp_, double Ki_, double Kd_);
+  void init(double kp, double ki, double kd, double max_i, double effort_limit = 1);
 
   /**
-   * Update the PID error variables given cross track error.
+   * return effort for the given CTE error
    * @param cte The current cross track error
+   * @return effort
    */
-  void UpdateError(double cte);
+  double run(double cte);
 
-  /**
-   * Calculate the total PID error.
-   * @output The total PID error
+  /*
+   * returns the debug string
    */
-  double TotalError();
+  std::string get_debug_string();
 
  private:
   /**
-   * PID Errors
+   * generate a debug string for logging
    */
-  double p_error;
-  double i_error;
-  double d_error;
+  std::string mk_debug_string(double cte, double diff, double sum,
+    double effort, double kp, double ki, double kd);
 
   /**
-   * PID Coefficients
+   * PID params
    */
-  double Kp;
-  double Ki;
-  double Kd;
+  double kp_;
+  double ki_;
+  double kd_;
+  double max_i_;
+  double effort_limit_;
+
+  double cte_prev_;
+  double cte_sum_;
+
+  std::string debug_string_;
 };
