@@ -2,13 +2,17 @@
 
 #include <string>
 #include <sstream>
+#include "windowed_average.hpp"
 
 class PID {
  public:
   /**
    * Constructor
+   * @param diff_windows_size: difference average window size
+   * @param output_window_size: output average window size
    */
-  PID() {};
+  PID(double diff_window_size = 1, double output_window_size = 1)
+    : diff_average_(diff_window_size), output_average_(diff_window_size) {};
 
   /**
    * Destructor.
@@ -18,10 +22,9 @@ class PID {
   /**
    * Initialize PID.
    * @param (ki, ki, kd) PID coefficients
-   * @param max_i Maximum integral windup
    * @param effort_limit max absolute error
    */
-  void init(double kp, double ki, double kd, double max_i, double effort_limit = 1);
+  void init(double kp, double ki, double kd, double effort_limit = 1);
 
   /**
    * return effort for the given CTE error
@@ -48,11 +51,13 @@ class PID {
   double kp_;
   double ki_;
   double kd_;
-  double max_i_;
   double effort_limit_;
 
+  // PID class state
   double cte_prev_;
   double cte_sum_;
+  WindowedAverage diff_average_;
+  WindowedAverage output_average_;
 
   std::string debug_string_;
 };

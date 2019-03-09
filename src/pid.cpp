@@ -1,11 +1,10 @@
 #include "pid.hpp"
 
-void PID::init(double kp, double ki, double kd, double max_i, double effort_limit) {
+void PID::init(double kp, double ki, double kd, double effort_limit) {
   // update params
   kp_ = kp;
   ki_ = ki;
   kd_ = kd;
-  max_i_ = max_i;
   effort_limit_ = effort_limit;
 
   cte_prev_ = 0;
@@ -13,16 +12,25 @@ void PID::init(double kp, double ki, double kd, double max_i, double effort_limi
 }
 
 double PID::run(double cte) {
-  double diff = cte - cte_prev_;
+  double diff, effort;
+  if(diff_average_.get_window_size() > 1) {
+    diff = diff_average_.get_average(cte - cte_prev_);
+  } else {
+    diff = cte - cte_prev_;
+  }
   cte_prev_ = cte;
   cte_sum_ += cte;
-  double effort = -kp_ * cte - kd_ * diff - ki_ * cte_sum_;
+  if(output_average_.get_window_size() > 1) {
+    effort = output_average_.get_average(-kp_ * cte - kd_ * diff - ki_ * cte_sum_);
+  } else {
+    effort = -kp_ * cte - kd_ * diff - ki_ * cte_sum_;
+  }
   if (effort > effort_limit_) {
     effort = effort_limit_;
   } else if (effort < -effort_limit_) {
     effort = -effort_limit_;
   }
-  debug_string_ = mk_debug_string(cte, diff, cte_sum_, effort, kp_, ki_, kd_);
+  debug_string_ = mk_debug_string(-kp_ * cte,- kd_ * diff, - ki_ * cte_sum_, effort, kp_, ki_, kd_);
   return effort;
 }
 

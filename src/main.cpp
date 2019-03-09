@@ -2,12 +2,15 @@
 #include <fstream>
 #include <vector>
 #include <tuple>
+#include <cmath>
 
 #include "io.hpp"
 #include "pid.hpp"
 #include "twiddle.hpp"
 
 const int PORT = 4567;
+const double REF_SPEED = 80;
+const double SPEED_REDUCTION_FACTOR = 20;
 
 int main(int argc, char** argv) {
   bool train = false;
@@ -26,23 +29,29 @@ int main(int argc, char** argv) {
     logger.open(log_name);
   }
 
-  Twiddle twiddle(0.2, 3000, 200, 0.05, 0.0001, 1.0, 1, 1, 1);
+  // twiddle for steering
+  Twiddle twiddle(0.2, 1500, 200, 5, 3, 0.1, 0.0008, 5.0, 0.05, 0.0001, 1.0);
 
-  PID pid;
-  pid.init(1.6, 0.00048, 19.3, 0);
+  PID steering_pid(5, 3);
+  steering_pid.init(0.1, 0.0008, 5.0);
+
+  PID throttle_pid(5, 1);
+  throttle_pid.init(0.5, 0.00001, 1.0);
   std::cout << "Connecting to simulator" << std::endl;
-
   SimIO simulator(PORT, [&](double cte, double speed, double angle) {
-    double steering;
+    double steering, throttle;
     bool reset = false;
     if(train) {
       std::tie(steering, reset) = twiddle.run(cte);
+    } else {
+      steering = steering_pid.run(cte);
     }
-    steering = pid.run(cte);
+    throttle = throttle_pid.run(speed - (REF_SPEED -
+      fabs(cte) * SPEED_REDUCTION_FACTOR));
     if(log_name != "") {
-      logger << pid.get_debug_string() << std::endl;
+      logger << steering_pid.get_debug_string() << std::endl;
     }
-    return std::make_tuple(steering, 0.3, reset);
+    return std::make_tuple(steering, throttle, reset);
   });
   simulator.run();
 

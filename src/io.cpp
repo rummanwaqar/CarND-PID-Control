@@ -31,7 +31,7 @@ SimIO::SimIO(int port, ProcessCb cb) : port_(port), callbackFunc_(cb) {
             // send output message
             nlohmann::json msgJson;
             msgJson["steering_angle"] = steer_value;
-            msgJson["throttle"] = 0.3;
+            msgJson["throttle"] = throttle;
             auto msg = "42[\"steer\"," + msgJson.dump() + "]";
             ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
           }
