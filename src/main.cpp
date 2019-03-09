@@ -9,7 +9,7 @@
 #include "twiddle.hpp"
 
 const int PORT = 4567;
-const double REF_SPEED = 80;
+const double REF_SPEED = 70;
 const double SPEED_REDUCTION_FACTOR = 20;
 
 int main(int argc, char** argv) {
@@ -30,10 +30,10 @@ int main(int argc, char** argv) {
   }
 
   // twiddle for steering
-  Twiddle twiddle(0.2, 1500, 200, 5, 3, 0.1, 0.0008, 5.0, 0.05, 0.0001, 1.0);
+  Twiddle twiddle(0.2, 1500, 200, 5, 3, 0.1, 0.0007, 5.0, 0.05, 0.0001, 1.0);
 
   PID steering_pid(5, 3);
-  steering_pid.init(0.1, 0.0008, 5.0);
+  steering_pid.init(0.1, 0.0007, 4.5);
 
   PID throttle_pid(5, 1);
   throttle_pid.init(0.5, 0.00001, 1.0);
