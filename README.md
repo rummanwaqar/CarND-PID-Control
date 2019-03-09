@@ -31,9 +31,9 @@ This project implements 2 PID controllers to control the steering angle and thro
 ## Details
 For the steering PID controller, the proportional section is used to minimize the cross track error and keep the car in the middle of the road; the derivate is used to damped the oscillations; the system did not have a inherent bias, however the integral part was still useful to get to minimize the error over time.
 
-The hyper-parameters were manually tuned by a trial method. Once we had a good estimate, coordinate ascent was used to fine tune the parameters. The coordinate ascent (twiddle) algorithm was used to go through multiple parameters and pick the ones with the lowest error. Additional error cost was added to the function if the vehicle drove off the road.
+The hyper-parameters were manually tuned. Once we had a good estimate, coordinate ascent was used to fine tune the parameters. The coordinate ascent (twiddle) algorithm was used to go through multiple parameters and pick the ones with the lowest error. Additional error cost was added to the function if the vehicle drove off the road.
 
-The algorithm did not perform too well at speeds above 60 MPH. To drive the vehicle at faster speeds, the reference speed was lowered based on the cross train error.
+The algorithm did not perform too well at speeds above 60 MPH. To drive the vehicle at faster speeds, the reference speed was lowered based on the cross track error.
 
 One other improvement to the system was adding a windowed smoothing filter to the error difference. This helped remove high frequency components from the final output.
 
