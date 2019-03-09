@@ -37,4 +37,4 @@ The algorithm did not perform too well at speeds above 60 MPH. To drive the vehi
 
 One other improvement to the system was adding a windowed smoothing filter to the error difference. This helped remove high frequency components from the final output.
 
-![alt text](docs/diff_filter.png)
+![alt text](imgs/diff_filter.png)
